@@ -1,0 +1,65 @@
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: oaicn
+#   labels:
+#     app: oaicn
+# spec:
+#   ports:
+#     - port: 3306
+#   selector:
+#     app: oaicn
+#   clusterIP: None
+# ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: oai-nr-gnb-cu
+  labels:
+    app: oaicn
+  annotations:
+    container.apparmor.security.beta.kubernetes.io/oaicn: unconfined
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: oaicn
+  template:
+    metadata:
+      labels:
+        app: oaicn
+    spec:
+      containers:
+      - name: oai-nr-gnb-cu
+        image: rohankharade/nr_gnb_cu:latest
+        imagePullPolicy: Always
+        command: ["/sbin/init"]
+        securityContext:
+          privileged: true
+
+        volumeMounts:
+        - mountPath: /sys/fs/cgroup/
+          name: cgroup
+        - mountPath: /lib/modules/
+          name: module
+        ports:
+        - containerPort: 80
+      volumes:
+      - name: cgroup
+        hostPath:
+          path: /sys/fs/cgroup/
+      - name: module
+        hostPath:
+          path: /lib/modules/
+
+# docker run \
+# --tmpfs /run \
+# --tmpfs /run/lock \
+# --tmpfs /tmp \
+# --cap-add SYS_ADMIN \
+# --device=/dev/fuse \
+# --security-opt apparmor:unconfined  --security-opt seccomp:unconfined \
+# -v /sys/fs/cgroup:/sys/fs/cgroup:ro \
+# -v /lib/modules:/lib/modules:ro \
+# -h ubuntu \
+# -d $IMGNAME

@@ -1,0 +1,83 @@
+version: '2'
+
+services:
+  oaicn_hss:
+    image: rohankharade/oai-cn:1.0
+    restart: unless-stopped
+    container_name: oaicn
+    hostname: ubuntu
+    privileged: true
+    depends_on:
+      - "mysql"
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      - /lib/modules:/lib/modules:ro
+    networks:
+      - oai
+
+  oaicn_mme:
+    image: rohankharade/oai-cn:1.0
+    restart: unless-stopped
+    container_name: oaicn
+    hostname: ubuntu
+    privileged: true
+    depends_on:
+      - "mysql"
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      - /lib/modules:/lib/modules:ro
+    networks:
+      - oai
+
+  oaicn_spgw:
+    image: rohankharade/oai-cn:1.0
+    restart: unless-stopped
+    container_name: oaicn
+    hostname: ubuntu
+    privileged: true
+    depends_on:
+      - "mysql"
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      - /lib/modules:/lib/modules:ro
+    networks:
+      - oai
+      
+  mysql:
+    image: mysql:5.6
+    restart: unless-stopped
+    container_name: mysql
+    ports:
+      - 3306:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=linux
+    networks:
+      - oai
+
+  nr_gnb_cu:
+    image: rohankharade/nr_gnb_cu:latest
+    restart: unless-stopped
+    container_name: nr_gnb_cu
+    hostname: ubuntu
+    privileged: true
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      - /lib/modules:/lib/modules:ro
+    networks:
+      - oai
+
+  nr_gnb_du:
+    image: rohankharade/nr_gnb_du:latest
+    restart: unless-stopped
+    container_name: nr_gnb_du
+    hostname: ubuntu
+    privileged: true
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      - /lib/modules:/lib/modules:ro
+    networks:
+      - oai
+
+networks:
+  oai:
+    driver: bridge
